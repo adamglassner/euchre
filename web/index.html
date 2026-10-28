@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Euchre - A Midwest Kitchen-Table Game</title>
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="bar">
+  <div class="title">Euchre<small>Friday night at the kitchen table</small></div>
+  <button id="bNew" title="Start a new game (F2)">New Game</button>
+  <button id="bMenu" title="Back to the title card">Kitchen</button>
+  <button id="bRules" title="How to play">Rules</button>
+  <span class="sep"></span>
+  <button id="bMusic" class="tog" title="Music (M)">&#9835; Music</button>
+  <input id="vol" type="range" min="0" max="100" title="Volume">
+  <button id="bSfx" class="tog" title="Sound effects">Sounds</button>
+  <div class="now" id="now"></div>
+  <div class="stats"><span>Games <b id="sPlayed">0</b></span><span>Won <b id="sWon">0</b></span><span>Euchres <b id="sEuchres">0</b></span></div>
+</header>
+
+<main id="room">
+  <div id="table">
+    <canvas id="props"></canvas>
+    <div id="mat"></div>
+    <div id="seats"></div>
+    <div id="cards"></div>
+    <div id="trumpBox" class="box"><div class="lbl">Trump</div><div class="suit" id="tSuit">&ndash;</div><div class="sub" id="tSub">Dealing&hellip;</div></div>
+    <div id="scoreBox" class="box">
+      <div class="lbl">Score <span id="toWin"></span></div>
+      <div class="team us"><span class="nm">Us</span><span class="who">You &amp; Barb</span><b id="ptsUs">0</b><span class="tr" id="trUs"></span></div>
+      <div class="team them"><span class="nm">Them</span><span class="who">Dale &amp; June</span><b id="ptsThem">0</b><span class="tr" id="trThem"></span></div>
+    </div>
+    <div id="bid" class="hidden"><div class="q" id="bidQ"></div><div class="btns" id="bidBtns"></div></div>
+    <div id="prompt"></div>
+    <div id="banner"></div>
+    <canvas id="fx"></canvas>
+    <div id="lamp"></div>
+    <div id="ver"></div>
+  </div>
+</main>
+
+<div class="veil" id="title">
+  <div class="panel title-panel">
+    <div class="kick">Friday Night &middot; Kitchen Table</div>
+    <h1>Euchre</h1>
+    <h2>A Midwest Card Game</h2>
+    <div class="fan" id="titleFan"></div>
+    <div class="folks" id="folks"></div>
+    <div class="opts">
+      <div class="opt"><span>Play to</span><div class="chips" id="optTarget"><button data-v="5">5</button><button data-v="10">10</button></div></div>
+      <div class="opt"><span>Stick the dealer</span><div class="chips" id="optStick"><button data-v="1">On</button><button data-v="0">Off</button></div></div>
+      <div class="opt"><span>Pace</span><div class="chips" id="optSpeed"><button data-v="relaxed">Easy</button><button data-v="normal">Regular</button><button data-v="brisk">Quick</button></div></div>
+    </div>
+    <button class="big" id="bStart">Deal 'Em</button>
+    <div class="links"><button id="bHow">How to Play</button> &middot; <button id="bCredits">Credits &amp; Changelog</button></div>
+    <div class="record" id="record"></div>
+    <div class="by"><span>An</span><img src="ironite-logo.png" alt="Ironite"><span>game</span></div>
+  </div>
+</div>
+
+<div class="veil hidden" id="rules">
+  <div class="panel text-panel">
+    <h3>How to Play Euchre</h3>
+    <p>Four players in two teams: <b>you and Barb</b> (across the table) against <b>Dale and June</b>. The deck is just the 9s through Aces: 24 cards.</p>
+    <ol>
+      <li><b>The deal.</b> Everyone gets 5 cards. The other 4 make the kitty, and its top card is turned face up.</li>
+      <li><b>Making trump.</b> Starting left of the dealer, each player can <b>order up</b> the face-up card (its suit becomes trump and the dealer picks it up, then discards one) or <b>pass</b>. If everyone passes, the card is turned down and each player may <b>name</b> any other suit, or pass. With <i>stick the dealer</i>, the dealer has to name one.</li>
+      <li><b>The bowers.</b> The Jack of trump is the <b>right bower</b> (the highest card). The other Jack of the same colour is the <b>left bower</b> (second highest) and counts as trump. Then A, K, Q, 10, 9 of trump.</li>
+      <li><b>Playing.</b> The player left of the dealer leads. You must follow suit if you can; otherwise play anything, including trump. The highest trump wins the trick, or else the highest card of the suit led. The winner leads next.</li>
+      <li><b>Scoring.</b> The team that made trump scores 1 point for 3 or 4 tricks and 2 for all 5 (a <b>march</b>). If they take fewer than 3, they're <b>euchred</b> and the other team scores 2.</li>
+      <li><b>Going alone.</b> Whoever makes trump can go alone; their partner sits out. A lone march is worth 4 points.</li>
+    </ol>
+    <p class="muted">Keys: F2 new game &middot; M music on/off &middot; F11 full screen</p>
+    <button class="big small" data-close>You Betcha</button>
+  </div>
+</div>
+
+<div class="veil hidden" id="credits">
+  <div class="panel text-panel">
+    <h3>Credits</h3>
+    <div class="cred">
+      <div><span>Developed &amp; Published by</span><b>Ironite</b></div>
+      <div><span>Game Design</span><b>Ironite</b></div>
+      <div><span>Card Art &amp; Illustration</span><b>Ironite</b></div>
+      <div><span>Music</span><b>Ironite</b></div>
+      <div class="tunes" id="tuneList"></div>
+      <div><span>Sound Effects</span><b>Ironite</b></div>
+      <div><span>Typefaces</span><b>Alfa Slab One &amp; Bitter (SIL Open Font License)</b></div>
+    </div>
+    <p class="muted">Copyright &copy; 2026 Ironite. All rights reserved.</p>
+    <h3>Changelog</h3>
+    <div id="changelog" class="changelog"></div>
+    <button class="big small" data-close>Close</button>
+  </div>
+</div>
+
+<div class="veil hidden" id="result">
+  <div class="panel result-panel">
+    <div class="kick" id="rKick"></div>
+    <h1 id="rTitle"></h1>
+    <h2 id="rSub"></h2>
+    <div class="final" id="rFinal"></div>
+    <div class="record" id="rRecord"></div>
+    <div class="row"><button class="big" id="bAgain">Play Again</button><button class="big ghost" id="bToMenu">Kitchen</button></div>
+  </div>
+</div>
+
+<script src="art.js"></script>
+<script src="audio.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
