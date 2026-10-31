@@ -9,7 +9,8 @@ grep -q "const VERSION = '$VERSION'" web/game.js || { echo "web/game.js VERSION 
 OUT=$PWD/dist; STAGE=$OUT/Euchre
 rm -rf "$OUT" app/web && mkdir -p "$STAGE"
 cp -r web app/web && rm -f app/web/preview.html
-/tmp/mkres -version "$VERSION" -icon assets/icon.png -name "Euchre" -desc "Euchre - A Midwest Kitchen-Table Game" \
+( cd tools/mkres && GOFLAGS=-mod=vendor go build -o "$OUT/mkres" . )
+"$OUT/mkres" -version "$VERSION" -icon assets/icon.png -name "Euchre" -desc "Euchre - A Midwest Kitchen-Table Game" \
   -exe Euchre.exe -internal Euchre -identity Ironite.Euchre -out app/rsrc_windows_amd64.syso
 ( cd app && GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H windowsgui -s -w -X main.version=$VERSION" -o "$STAGE/Euchre.exe" . )
 for f in README.txt CREDITS.txt; do sed "s/@VERSION@/$VERSION/g; s/\$/\r/" "$f" > "$STAGE/$f"; done
