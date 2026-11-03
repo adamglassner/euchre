@@ -1,20 +1,33 @@
 #!/usr/bin/env bash
-# Builds Euchre.exe and the standalone zip. Version comes from VERSION;
-# add a matching entry to web/CHANGELOG.md for every release.
+# Builds Euchre for Windows (64-bit).
+# Output: dist/Euchre/ with Euchre.exe and its text files, ready for the
+# Ironite Launcher (the release zip) or for installer/EuchreSetup.iss.
+# Needs Go 1.24+ and bash (Git Bash on Windows is fine). No C compiler needed.
 set -euo pipefail
 cd "$(dirname "$0")"
-VERSION=$(tr -d ' \r\n' < VERSION)
-grep -q "^## \[$VERSION\]" web/CHANGELOG.md || { echo "web/CHANGELOG.md has no entry for $VERSION"; exit 1; }
-grep -q "const VERSION = '$VERSION'" web/game.js || { echo "web/game.js VERSION does not match $VERSION"; exit 1; }
-OUT=$PWD/dist; STAGE=$OUT/Euchre
-rm -rf "$OUT" app/web && mkdir -p "$STAGE"
-cp -r web app/web && rm -f app/web/preview.html
-( cd tools/mkres && GOFLAGS=-mod=vendor go build -o "$OUT/mkres" . )
-"$OUT/mkres" -version "$VERSION" -icon assets/icon.png -name "Euchre" -desc "Euchre - A Midwest Kitchen-Table Game" \
-  -exe Euchre.exe -internal Euchre -identity Ironite.Euchre -out app/rsrc_windows_amd64.syso
-( cd app && GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath -ldflags "-H windowsgui -s -w -X main.version=$VERSION" -o "$STAGE/Euchre.exe" . )
-for f in README.txt CREDITS.txt; do sed "s/@VERSION@/$VERSION/g; s/\$/\r/" "$f" > "$STAGE/$f"; done
-sed 's/$/\r/' web/CHANGELOG.md > "$STAGE/CHANGELOG.txt"
-cp web/fonts/OFL.txt "$STAGE/OFL.txt"
-( cd "$OUT" && zip -qr "Euchre-$VERSION.zip" Euchre )
-ls -la "$STAGE" "$OUT"/*.zip
+ROOT=$PWD
+BUNDLE=Euchre
+EXE=Euchre
+OUT=$ROOT/dist
+export GOFLAGS=-mod=mod
+rm -rf "$OUT" && mkdir -p "$OUT/$BUNDLE"
+
+VERSION=$(grep -m1 -oE '^## \[[0-9.]+' CHANGELOG.md | tr -d '#[ ')
+
+# Windows resource (icon + version info) for the .exe
+( cd tools/mkres && GOFLAGS=-mod=vendor go build -o "$ROOT/mkres.tmp" . )
+"$ROOT/mkres.tmp" -version "$VERSION" -icon icon-1024.png -out rsrc_windows_amd64.syso \
+  -name "Euchre" -exe "$EXE.exe" -internal "$EXE" -identity "Ironite.$BUNDLE" -desc "Euchre - A Midwest Kitchen-Table Game"
+rm -f "$ROOT/mkres.tmp"
+
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -trimpath \
+  -ldflags "-H windowsgui -s -w -X main.version=$VERSION" -o "$OUT/$BUNDLE/$EXE.exe" .
+rm -f rsrc_windows_amd64.syso
+
+crlf() { sed 's/\r$//; s/$/\r/' "$1" > "$2"; }
+crlf CHANGELOG.md "$OUT/$BUNDLE/CHANGELOG.txt"
+crlf assets/fonts/OFL.txt "$OUT/$BUNDLE/OFL.txt"
+sed "s/@VERSION@/$VERSION/g" README.txt  | sed 's/\r$//; s/$/\r/' > "$OUT/$BUNDLE/README.txt"
+sed "s/@VERSION@/$VERSION/g" CREDITS.txt | sed 's/\r$//; s/$/\r/' > "$OUT/$BUNDLE/CREDITS.txt"
+printf '%s\r\n' "$VERSION" > "$OUT/$BUNDLE/VERSION"
+echo "$BUNDLE $VERSION -> $OUT/$BUNDLE/$EXE.exe"

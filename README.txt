@@ -2,15 +2,12 @@ EUCHRE - A Midwest Kitchen-Table Game  (v@VERSION@)
 An Ironite game. (c) 2026 Ironite.
 ===================================================
 
-Double-click Euchre.exe to play. Nothing to install.
-
-The game opens in its own window using Microsoft Edge (built into
-Windows 10 and 11). If Windows shows "Windows protected your PC",
-click "More info" then "Run anyway" - the app is not code-signed yet.
+Open Euchre from the Start menu (Ironite folder), your desktop, or the
+Ironite Launcher. Or just double-click Euchre.exe.
 
 HOW TO PLAY
-- You and Aunt Barb (across the table) play against Uncle Dale and
-  Grandma June. The deck is the 9s through Aces: 24 cards.
+- Four players in two teams; partners sit across the table. The deck is
+  the 9s through Aces: 24 cards.
 - Order up the turned card, or pass. If everyone passes, name any
   other suit, or pass. With "stick the dealer" the dealer must call.
 - The Jack of trump is the right bower (highest), the other Jack of
@@ -22,6 +19,20 @@ HOW TO PLAY
   scores 2. First team to 10 (or 5) wins.
 - F2 = new game, M = music on/off, F11 = full screen.
 
-Your record and settings are saved in %APPDATA%\Ironite\Euchre.
+WAYS TO PLAY
+- Deal 'Em: you and a computer partner against two computer folks, a
+  different three each game.
+- Play Together > Same Computer: 2 to 4 people share this PC. Before each
+  person's turn the game asks you to pass the computer over, and cards
+  turn face down in between. Choose who partners with Player 1.
+- Play Together > Online: one person picks Host, the others pick Join and
+  type the host's address (shown on the host's screen). The first friend
+  to join sits across as the host's partner; the host can switch anyone
+  between teams. Empty seats are filled by computer folks. Online games
+  use port 47018; across the internet the host may need to forward that
+  port on their router.
 
-All card art, music and sounds are original and made by the game.
+Your record and settings are saved in %APPDATA%\Ironite\Euchre, outside
+the install folder, so updating or reinstalling keeps them.
+
+All card art, music and sounds are original and made by Ironite.

@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:"Bitter";src:url(../../assets/fonts/Bitter.ttf);font-weight:100 900}
+@font-face{font-family:"Bitter";font-style:italic;src:url(../../assets/fonts/Bitter-Italic.ttf);font-weight:100 900}
+@font-face{font-family:"Alfa Slab One";src:url(../../assets/fonts/AlfaSlabOne-Regular.ttf)}
+body{margin:0;background:#222}</style></head><body><script src="art.js"></script><script>
+window.out={};
+(async()=>{for(const f of ['40px "Bitter"','italic 700 30px "Bitter"','40px "Alfa Slab One"'])await document.fonts.load(f);
+const card=id=>Art.face({s:id[0],r:+id.slice(1)});
+function gingham(c,w,h,sz){c.fillStyle='#f6efe0';c.fillRect(0,0,w,h);c.fillStyle='rgba(168,36,32,.5)';for(let x=0;x<w;x+=sz*2)c.fillRect(x,0,sz,h);for(let y=0;y<h;y+=sz*2)c.fillRect(0,y,w,sz);
+ const v=c.createRadialGradient(w/2,h*.45,h*.2,w/2,h*.5,Math.max(w,h)*.8);v.addColorStop(0,'rgba(255,230,180,.12)');v.addColorStop(1,'rgba(70,30,5,.5)');c.fillStyle=v;c.fillRect(0,0,w,h);}
+function fan(c,cx,by,cardW,ids,spread){const n=ids.length,order=ids.map((x,i)=>i).sort((a,b)=>Math.abs(b-(n-1)/2)-Math.abs(a-(n-1)/2));
+ order.forEach(i=>{const k=i-(n-1)/2;c.save();c.translate(cx+k*cardW*.38,by);c.rotate(k*spread*Math.PI/180);c.shadowColor='rgba(0,0,0,.45)';c.shadowBlur=cardW*.12;c.shadowOffsetY=cardW*.05;const ch=cardW*Art.CH/Art.CW;c.drawImage(card(ids[i]),-cardW/2,-ch,cardW,ch);c.restore();});}
+function title(c,x,y,size,txt){c.textAlign='center';c.font=`${size}px "Alfa Slab One"`;c.fillStyle='#5a1410';c.fillText(txt,x,y+size*.07);c.fillStyle='#a3302a';c.fillText(txt,x,y);}
+out.icon=Art.icon(1024).toDataURL();
+{const W=800,H=1000,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');gingham(c,W,H,50);
+ c.fillStyle='#fff8e8';c.strokeStyle='#5a3417';c.lineWidth=8;c.beginPath();c.roundRect(70,150,660,250,24);c.fill();c.stroke();
+ c.fillStyle='#8a6a4a';c.font='26px "Alfa Slab One"';c.textAlign='center';c.fillText('FRIDAY NIGHT',W/2,205);
+ title(c,W/2,322,128,'Euchre');c.fillStyle='#5a4030';c.font='italic 700 34px "Bitter"';c.fillText('A Midwest Card Game',W/2,374);
+ const mg=Art.mug(230);c.drawImage(mg,10,560,230,230);const pc=Art.popcorn(260);c.drawImage(pc,540,560,260,260);
+ fan(c,W/2,H*0.99,250,['S9','H11','D11','C14','H13'],13);out.cover=cv.toDataURL();}
+{const W=2400,H=840,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');gingham(c,W,H,56);
+ const g=c.createLinearGradient(0,0,W*.62,0);g.addColorStop(0,'rgba(40,18,6,.92)');g.addColorStop(.75,'rgba(40,18,6,.55)');g.addColorStop(1,'rgba(40,18,6,0)');c.fillStyle=g;c.fillRect(0,0,W,H);
+ c.save();c.translate(W*.72,H*.62);c.fillStyle='#c9a463';c.beginPath();c.ellipse(0,0,500,300,0,0,7);c.fill();for(let r=480;r>0;r-=18){c.strokeStyle=r%36?'rgba(140,100,40,.35)':'rgba(255,240,200,.25)';c.lineWidth=6;c.beginPath();c.ellipse(0,0,r,r*.6,0,0,7);c.stroke();}c.restore();
+ fan(c,W*.72,H*1.04,290,['C9','S11','C11','C14','C13'],12);
+ const mg=Art.mug(300);c.drawImage(mg,W*.92-150,H*.16-60,300,300);
+ ['barb','dale','june'].forEach((w,i)=>{const cm=Art.cameo(w,190);c.save();c.shadowColor='rgba(0,0,0,.5)';c.shadowBlur=22;c.drawImage(cm,W*(.52+i*.12)-95,H*.2-95,190,190);c.restore();});
+ out.hero=cv.toDataURL();}
+document.title='ready';})();
+</script></body></html>

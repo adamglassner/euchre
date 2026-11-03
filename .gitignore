@@ -1,3 +1,6 @@
 dist/
-app/web/
-app/*.syso
+build/
+installer/Output/
+Output/
+rsrc_windows_amd64.syso
+mkres.tmp

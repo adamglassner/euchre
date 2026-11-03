@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:"Bitter";src:url(../../assets/fonts/Bitter.ttf);font-weight:100 900}
+@font-face{font-family:"Bitter";font-style:italic;src:url(../../assets/fonts/Bitter-Italic.ttf);font-weight:100 900}
+@font-face{font-family:"Alfa Slab One";src:url(../../assets/fonts/AlfaSlabOne-Regular.ttf)}
+body{margin:0;background:#222}</style></head><body>
+<!-- Bakes the original canvas art (art.js) and WebAudio music/sound (audio.js)
+     into the PNG and audio files the Go game embeds. Run: node tools/bake/bake.mjs -->
+<script src="art.js"></script>
+<script>
+window.bake = {};
+(async () => {
+  for (const f of ['40px "Bitter"', 'italic 700 30px "Bitter"', '40px "Alfa Slab One"']) await document.fonts.load(f);
+  /* ---------- images ---------- */
+  const img = {};
+  for (const s of ['S', 'H', 'D', 'C']) for (let r = 9; r <= 14; r++) img['cards/' + s + r] = Art.face({ s, r });
+  img['cards/back'] = Art.back();
+  for (const w of Object.keys(Art.PEOPLE)) img['cameo-' + w] = Art.cameo(w, 240);
+  img['mug'] = Art.mug(320);
+  img['popcorn'] = Art.popcorn(400);
+  for (const n of [16, 32, 48, 64, 256]) img['icon-' + n] = Art.icon(n);
+  bake.images = Object.fromEntries(Object.entries(img).map(([k, c]) => [k, c.toDataURL('image/png')]));
+
+  /* ---------- audio: run audio.js against an OfflineAudioContext ---------- */
+  let src = window.__audioSrc;   // injected by bake.mjs (file:// pages can't fetch)
+  src = src.replace('ctx = new AC();', 'ctx = window.__mkCtx ? window.__mkCtx() : new AC();')
+           .replace("if (ctx.state === 'suspended') ctx.resume();", "if (ctx.state === 'suspended' && !window.__mkCtx) ctx.resume();")
+           .replace('return {\n    unlock()', 'return {\n    __r: { reset() { ctx = null; }, fx, TUNES, buildQueue, accordion, tuba, pluck, setVol(v) { volume = v; } },\n    unlock()');
+  if (!src.includes('__r:') || !src.includes('__mkCtx')) throw new Error('audio.js patch failed');
+  (0, eval)(src + '\nwindow.Sound = Sound;');
+  const R = Sound.__r, SR = 44100;
+  async function render(seconds, fn) {
+    R.reset(); R.setVol(1);
+    const oc = new OfflineAudioContext(2, Math.ceil(SR * seconds), SR);
+    window.__mkCtx = () => oc;
+    Sound.unlock(); fn(oc);
+    const buf = await oc.startRendering();
+    return [buf.getChannelData(0), buf.getChannelData(1)];
+  }
+  function wav([L, Rr]) {
+    let n = L.length;                     // trim trailing silence
+    while (n > 1 && Math.abs(L[n - 1]) < 1e-4 && Math.abs(Rr[n - 1]) < 1e-4) n--;
+    const b = new DataView(new ArrayBuffer(44 + n * 4)), w = (o, s) => [...s].forEach((ch, i) => b.setUint8(o + i, ch.charCodeAt(0)));
+    w(0, 'RIFF'); b.setUint32(4, 36 + n * 4, true); w(8, 'WAVE'); w(12, 'fmt '); b.setUint32(16, 16, true); b.setUint16(20, 1, true); b.setUint16(22, 2, true);
+    b.setUint32(24, SR, true); b.setUint32(28, SR * 4, true); b.setUint16(32, 4, true); b.setUint16(34, 16, true); w(36, 'data'); b.setUint32(40, n * 4, true);
+    for (let i = 0; i < n; i++) for (const [c, d] of [[0, L], [1, Rr]]) b.setInt16(44 + i * 4 + c * 2, Math.max(-1, Math.min(1, d[i])) * 32767, true);
+    let s = ''; const u = new Uint8Array(b.buffer); for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  bake.audio = {};
+  for (const name of Object.keys(R.fx)) bake.audio['sfx-' + name] = wav(await render(3.6, () => R.fx[name]()));
+  R.TUNES.forEach((t, i) => bake.tuneNames = (bake.tuneNames || []).concat(t.name));
+  for (let i = 0; i < R.TUNES.length; i++) {
+    const q = R.buildQueue(R.TUNES[i]), gap = 1.4;
+    // exact loop length (tune + the gap before the next tune); keep it untrimmed
+    const ch = await render(q.len + gap, oc => {
+      for (const e of q.ev) {
+        const t = e.t + 0.05;
+        if (e.i === 'acc') R.accordion(t, e.m, e.d, e.v);
+        else if (e.i === 'tuba') R.tuba(t, e.m, e.d, e.v);
+        else if (e.i === 'banjo') R.pluck(t, e.m, e.v, true);
+        else R.pluck(t, e.m - 12, e.v, false);
+      }
+    });
+    ch[0][ch[0].length - 1] = ch[1][ch[1].length - 1] = 0.001;   // stops the trim
+    bake.audio['tune-' + i] = wav(ch);
+  }
+  document.title = 'ready';
+})().catch(e => { document.title = 'error: ' + e.message; });
+</script></body></html>

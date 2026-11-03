@@ -1,18 +1,14 @@
-EUCHRE - A MIDWEST KITCHEN-TABLE GAME
-Version @VERSION@
-=====================================
+EUCHRE - A Midwest Kitchen-Table Game  (v@VERSION@)
+===================================================
 
 Developed & Published by ... Ironite
 Game Design ................ Ironite
 Card Art & Illustration .... Ironite
 Music ...................... Ironite
-  "Friday Night Polka", "County Fair Two-Step",
-  "Lake Effect Waltz"
+  "Friday Night Polka", "County Fair Two-Step", "Lake Effect Waltz"
 Sound Effects .............. Ironite
 Programming ................ Ironite
-
-Typefaces
-  Alfa Slab One and Bitter, used under the SIL Open Font
-  License 1.1 (see OFL.txt).
+Typefaces .................. Alfa Slab One & Bitter
+                             (SIL Open Font License, see OFL.txt)
 
 Copyright (c) 2026 Ironite. All rights reserved.
